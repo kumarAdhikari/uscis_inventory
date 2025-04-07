@@ -1,0 +1,8 @@
+version: '3'
+services:
+  uscis-dashboard:
+    build: .
+    ports:
+      - "5050:5050"
+    env_file:
+      - src/backend/.env
