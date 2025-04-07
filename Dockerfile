@@ -1,21 +1,26 @@
-# Base image
-FROM node:18
+# ---------- Build React frontend ----------
+FROM node:18-alpine as frontend
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install
-
-# Copy everything else
 COPY . .
 
-# Build frontend (assuming Vite)
-RUN npm run build
+# Build only the frontend
+RUN cd src && npm install && npm run build
 
-# Expose backend port
+# ---------- Backend server ----------
+FROM node:18-alpine as backend
+
+WORKDIR /app
+
+# Copy everything including the built frontend
+COPY . .
+
+# Install backend deps
+RUN cd src/backend && npm install
+
+# Expose port (adjust if needed)
 EXPOSE 5050
 
-# Start server
+# Start the backend server (which also serves the frontend)
 CMD ["node", "src/backend/server.js"]

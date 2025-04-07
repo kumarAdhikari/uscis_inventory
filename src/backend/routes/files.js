@@ -5,7 +5,14 @@ import XLSX from 'xlsx';
 import fs from 'fs';
 import path from 'path';
 import authMiddleware, { checkPassword } from '../middleware/auth.js';
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.resolve('uploads');
+
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const UPLOAD_DIR = path.join(__dirname, '../uploads');
+
 
 const router = express.Router();
 
@@ -13,11 +20,6 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/upload',checkPassword ,upload.single('file'), (req, res) => {
     console.log('Upload request received');
-    // const { password } = req.body;
-    //
-    // if (!checkPassword(password)) {
-    //     return res.status(403).json({ message: 'Invalid password' });
-    // }
 
     const file = req.file;
     console.log('✅ File uploaded:', file.originalname);
@@ -96,7 +98,7 @@ router.delete('/:filename', checkPassword,(req, res) => {
 });
 
 router.get("/", (req, res) => {
-    const files = fs.readdirSync(UPLOAD_DIR).filter(f => f.endsWith(".xlsx"));
+    const files = fs.readdirSync(UPLOAD_DIR).filter(f => f.endsWith(".xlsx"));;
     const result = [];
     const extractCategory = (preference) => {
         if (!preference) return "";
